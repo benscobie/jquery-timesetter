@@ -1,12 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "jquery-timesetter", ".", "{2E3BE6EF-E37D-426F-A4D5-BF77AA6CEF54}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_2071"
+		Debug.AspNetCompiler.PhysicalPath = "..\jquery-timesetter\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_2071\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_2071"
+		Release.AspNetCompiler.PhysicalPath = "..\jquery-timesetter\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_2071\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "2071"
 		SlnRelativePath = "..\jquery-timesetter\"
