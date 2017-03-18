@@ -37,7 +37,7 @@
             $(".div1").timesetter(options1).setHour(17);
             $(".div2").timesetter().setValuesByTotalMinutes(175);
 
-            $(".div1, .div2").on('updated.timesetter',
+            $(".div1, .div2").on('change.timesetter',
                 function(event, data) {
                     console.log(data);
                 });

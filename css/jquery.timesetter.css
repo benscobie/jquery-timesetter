@@ -1,10 +1,10 @@
-﻿.divTimeSetterContainer {
+﻿.timesetter-container {
     margin: 5px;
     float: left;
     position: relative;
 }
 
-    .divTimeSetterContainer .timeValueBorder {
+    .timesetter-container .timesetter-time-value-border {
         float: left;
         background-color: #ffffff;
         border: 1px solid #bebebe;
@@ -12,7 +12,7 @@
         height: 30px;
     }
 
-    .divTimeSetterContainer input.timePart {
+    .timesetter-container input.timesetter-time-part {
         float: left;
         margin-top: 1px;
         text-align: right;
@@ -26,36 +26,36 @@
         outline: none;
     }
 
-    .divTimeSetterContainer input.hours {
+    .timesetter-container input.hours {
         width: 30px;
     }
 
-    .divTimeSetterContainer input.minutes {
+    .timesetter-container input.minutes {
         width: 18px;
     }
 
-    .divTimeSetterContainer span.hourSymbol,
-    .divTimeSetterContainer span.minuteSymbol {
+    .timesetter-container span.timesetter-hour-symbol,
+    .timesetter-container span.timesetter-minute-symbol {
         float: left;
         margin: 6px 2px 0 2px;
         font-size: 0.9em;
     }
 
-    .divTimeSetterContainer span.timeDelimiter {
+    .timesetter-container span.timesetter-time-delimiter {
         float: left;
         font-size: 1.2em;
         font-weight: bold;
         margin: 2px 2px 0 2px;
     }
 
-    .divTimeSetterContainer .postfix-position {
+    .timesetter-container .timesetter-postfix-position {
         position: relative;
         right: -3px;
         top: 5px;
         font-weight: bold;
     }
 
-    .divTimeSetterContainer .button-time-control {
+    .timesetter-container .timesetter-button-time-control {
         width: 20px;
         float: left;
         position: relative;
@@ -64,7 +64,7 @@
         cursor: pointer;
     }
 
-        .divTimeSetterContainer .button-time-control div.updownButton {
+        .timesetter-container .timesetter-button-time-control div.timesetter-updown-button {
             width: 20px;
             float: left;
             height: 15px;
@@ -72,22 +72,22 @@
             text-align: center;
         }
 
-            .divTimeSetterContainer .button-time-control div.updownButton:first-child {
+            .timesetter-container .timesetter-button-time-control div.timesetter-updown-button:first-child {
                 border-top-right-radius: 3px;
                 border-bottom: none;
                 /* to remove double line */
             }
 
-            .divTimeSetterContainer .button-time-control div.updownButton:last-child {
+            .timesetter-container .timesetter-button-time-control div.timesetter-updown-button:last-child {
                 border-bottom-right-radius: 3px;
             }
 
-            .divTimeSetterContainer .button-time-control div.updownButton i {
+            .timesetter-container .timesetter-button-time-control div.timesetter-updown-button i {
                 font-weight: bold;
                 font-size: 0.7em;
                 top: -2px;
             }
 
-            .divTimeSetterContainer .button-time-control div.updownButton:hover {
+            .timesetter-container .timesetter-button-time-control div.timesetter-updown-button:hover {
                 background-color: #bebebe;
             }
