@@ -29,7 +29,7 @@
          * unit is taken out from self.settings to make it globally affect as currently user is concern about which unit to change.
          */
         var unit = "minutes"; /* minutes or hours */
-        var inputHourTextbox =  null;
+        var inputHourTextbox = null;
         var inputMinuteTextbox = null;
         var htmlTemplate =
             '<div class="timesetter-container">' +
@@ -124,9 +124,11 @@
             if (isNaN(self.settings.minute.value)) {
                 self.settings.minute.value = self.settings.minute.min;
             }
-			
-			var oldHourValue;
-			var newHourValue;
+
+            var oldHourValue;
+            var newHourValue;
+            var oldMinuteValue;
+            var newMinuteValue;
 
             // update time setter by changing hour value
             if (unit === "hours") {
@@ -160,15 +162,14 @@
 
                 $(inputHourTextbox).val(padLeft(newHourValue.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
                 $(container).attr("data-hour-value", newHourValue);
-                $(inputHourTextbox).trigger("change").select();
+                $(inputHourTextbox).select();
             }
             else if (unit === "minutes") // update time setter by changing minute value
             {
                 oldHourValue = self.settings.hour.value;
                 newHourValue = oldHourValue;
-
-                var oldMinuteValue = self.settings.minute.value;
-                var newMinuteValue = oldMinuteValue;
+                oldMinuteValue = self.settings.minute.value;
+                newMinuteValue = oldMinuteValue;
 
                 if (self.settings.direction === "decrement") {
                     newMinuteValue = oldMinuteValue - self.settings.minute.step;
@@ -217,19 +218,21 @@
                 $(inputMinuteTextbox).val(padLeft(newMinuteValue.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
                 $(container).attr("data-hour-value", newHourValue);
                 $(container).attr("data-minute-value", newMinuteValue);
-                $(inputMinuteTextbox).trigger("change").select();
+                $(inputMinuteTextbox).select();
 
                 saveOptions(container, self.settings);
             }
 
-            self.trigger('change.timesetter',
-                [
-                    {
-                        minute: self.getMinutesValue(),
-                        hour: self.getHoursValue()
-                    }
-                ]
-            );
+            if (oldHourValue != newHourValue || oldMinuteValue != newMinuteValue) {
+                self.trigger('change.timesetter',
+                    [
+                        {
+                            hour: self.getHoursValue(),
+                            minute: self.getMinutesValue()
+                        }
+                    ]
+                );
+            }
         };
 
         /**
@@ -451,7 +454,7 @@
          * set the postfix display text.
          */
         self.setPostfixText = function (textValue) {
-            var container =self.find(".timesetter-container");
+            var container = self.find(".timesetter-container");
             container.find(".timesetter-postfix-position").text(textValue);
             return this;
         };

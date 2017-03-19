@@ -14,7 +14,7 @@
   ],
   "style": "dist/css/jquery.timesetter.css",
   "sass": "src/scss/jquery.timesetter.scss",
-  "main": "dist/js/jquery-timesetter.js",
+  "main": "dist/js/jquery.timesetter.js",
   "scripts": {
     "clean-css": "cleancss --level 1 --output dist/css/jquery.timesetter.min.css dist/css/jquery.timesetter.css",
     "uglify": "uglifyjs --output dist/js/jquery.timesetter.min.js dist/js/jquery.timesetter.js"
