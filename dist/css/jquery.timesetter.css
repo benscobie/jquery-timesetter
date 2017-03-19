@@ -1,0 +1,66 @@
+.timesetter-container {
+  margin: 5px;
+  float: left;
+  position: relative; }
+  .timesetter-container .timesetter-time-value-border {
+    float: left;
+    background-color: #ffffff;
+    border: 1px solid #bebebe;
+    border-radius: 3px;
+    height: 30px; }
+  .timesetter-container input.timesetter-time-part {
+    float: left;
+    margin-top: 1px;
+    text-align: right;
+    height: 25px;
+    border: none;
+    font-size: 1.05em;
+    font-weight: bold;
+    border-radius: 3px;
+    padding: 0;
+    cursor: text;
+    outline: none; }
+  .timesetter-container input.hours {
+    width: 30px; }
+  .timesetter-container input.minutes {
+    width: 18px; }
+  .timesetter-container span.timesetter-hour-symbol,
+  .timesetter-container span.timesetter-minute-symbol {
+    float: left;
+    margin: 6px 2px 0 2px;
+    font-size: 0.9em; }
+  .timesetter-container span.timesetter-time-delimiter {
+    float: left;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 2px 2px 0 2px; }
+  .timesetter-container .timesetter-postfix-position {
+    position: relative;
+    right: -3px;
+    top: 5px;
+    font-weight: bold; }
+  .timesetter-container .timesetter-button-time-control {
+    width: 20px;
+    float: left;
+    position: relative;
+    right: -2px;
+    top: -1px;
+    cursor: pointer; }
+    .timesetter-container .timesetter-button-time-control div.timesetter-updown-button {
+      width: 20px;
+      float: left;
+      height: 15px;
+      border: 1px solid #bebebe;
+      text-align: center; }
+      .timesetter-container .timesetter-button-time-control div.timesetter-updown-button i {
+        font-weight: bold;
+        font-size: 0.7em;
+        top: -2px; }
+      .timesetter-container .timesetter-button-time-control div.timesetter-updown-button:first-child {
+        border-top-right-radius: 3px;
+        border-bottom: none;
+        /* to remove double line */ }
+      .timesetter-container .timesetter-button-time-control div.timesetter-updown-button:last-child {
+        border-bottom-right-radius: 3px; }
+      .timesetter-container .timesetter-button-time-control div.timesetter-updown-button:hover {
+        background-color: #bebebe; }
