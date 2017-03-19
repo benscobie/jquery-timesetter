@@ -1,13 +1,13 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-	
-	babel: {
+
+    babel: {
       options: {
         sourceMap: false,
-		presets: ['es2015']
+        presets: ['es2015']
       },
       dist: {
         files: {
@@ -15,20 +15,20 @@ module.exports = function(grunt) {
         }
       }
     },
-	
-	clean: {
+
+    clean: {
       dist: 'dist'
     },
-	
-	exec: {
+
+    exec: {
       'clean-css': {
         command: 'npm run clean-css'
       },
-	  uglify: {
+      uglify: {
         command: 'npm run uglify'
       },
-	},
-	
+    },
+
     jshint: {
       files: ['Gruntfile.js', 'src/js/*.js'],
       options: {
@@ -37,19 +37,19 @@ module.exports = function(grunt) {
         }
       }
     },
-	
-	sass: {
-        options: {
-            sourceMap: false
-        },
-        dist: {
-            files: {
-                'dist/css/jquery.timesetter.css': 'src/scss/jquery.timesetter.scss'
-            }
+
+    sass: {
+      options: {
+        sourceMap: false
+      },
+      dist: {
+        files: {
+          'dist/css/jquery.timesetter.css': 'src/scss/jquery.timesetter.scss'
         }
+      }
     },
-	
-	watch: {
+
+    watch: {
       js: {
         files: 'src/js/*.js',
         tasks: ['babel']
@@ -60,7 +60,7 @@ module.exports = function(grunt) {
       }
     }
   });
-  
+
   require("load-grunt-tasks")(grunt);
 
   grunt.registerTask('test', ['jshint']);
