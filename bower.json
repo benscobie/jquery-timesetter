@@ -3,7 +3,7 @@
   "description": "A jQuery plugin which generates a UI component to take user inputs or to display time values with hour and minutes in a friendly manner.",
   "main": [
     "dist/js/jquery.timesetter.js",
-	"dist/css/jquery.timesetter.css"
+    "dist/css/jquery.timesetter.css"
   ],
   "authors": [
     "Sandun Angelo Perera",

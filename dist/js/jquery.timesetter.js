@@ -199,7 +199,7 @@
                 }
 
             if (oldHourValue != newHourValue || oldMinuteValue != newMinuteValue) {
-                self.trigger('change.timestepper', [{
+                self.trigger('change.timesetter', [{
                     hour: self.getHoursValue(),
                     minute: self.getMinutesValue()
                 }]);
