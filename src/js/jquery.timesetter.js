@@ -31,6 +31,9 @@
         var unit = "minutes"; /* minutes or hours */
         var inputHourTextbox = null;
         var inputMinuteTextbox = null;
+        var btnUp = null;
+        var btnDown = null;
+        var container = null;
         var htmlTemplate =
             '<div class="timesetter-container">' +
             '<div class="timesetter-time-value-border">' +
@@ -61,28 +64,14 @@
         /**
          * save the element options' values as a data value within the element.
          */
-        var saveOptions = function (container, options) {
+        var saveOptions = function (options) {
             if (options) {
                 self.settings = $.extend(self.settings, options);
             }
             else {
                 self.settings = self.getDefaultSettings();
             }
-            $(container).data('options', self.settings);
-            return self.settings;
-        };
 
-        /**
-         * load the element's option values saved as data values.
-         */
-        var loadOptions = function (container) {
-            var savedOptions = $(container).data('options');
-            if (savedOptions) {
-                self.settings = $.extend(self.settings, $(container).data('options'));
-            }
-            else {
-                self.settings = self.getDefaultSettings();
-            }
             return self.settings;
         };
 
@@ -90,31 +79,17 @@
         * Capture the time unit which is about to update from events.
         */
         var unitChanged = function (sender) {
-            var container = $(sender).parents(".timesetter-container");
-            loadOptions(container);
-
             unit = $(sender).data("unit");
-
-            inputHourTextbox = container.find('.timesetter-hours');
-            inputMinuteTextbox = container.find('.timesetter-minutes');
-
-            saveOptions(container, self.settings);
         };
 
         /**
          * Change the time setter values from UI events.
          */
         var updateTimeValue = function (sender) {
-            var container = $(sender).parents(".timesetter-container");
-            loadOptions(container);
-
-            inputHourTextbox = container.find('.timesetter-hours');
-            inputMinuteTextbox = container.find('.timesetter-minutes');
-
             self.settings.hour.value = parseInt(inputHourTextbox.val());
             self.settings.minute.value = parseInt(inputMinuteTextbox.val());
 
-            self.settings.direction = $(sender).data("direction");
+            var direction = $(sender).data("direction");
 
             // validate hour and minute values
             if (isNaN(self.settings.hour.value)) {
@@ -135,7 +110,7 @@
                 oldHourValue = parseInt($(inputHourTextbox).val().trim());
                 newHourValue = 0;
 
-                if (self.settings.direction === "decrement") {
+                if (direction === "decrement") {
                     newHourValue = oldHourValue - self.settings.hour.step;
 
                     // tolerate the wrong step number and move to a valid step
@@ -147,7 +122,7 @@
                         newHourValue = self.settings.hour.min;
                     }
                 }
-                else if (self.settings.direction === "increment") {
+                else if (direction === "increment") {
                     newHourValue = oldHourValue + self.settings.hour.step;
 
                     // tolerate the wrong step number and move to a valid step
@@ -171,7 +146,7 @@
                 oldMinuteValue = self.settings.minute.value;
                 newMinuteValue = oldMinuteValue;
 
-                if (self.settings.direction === "decrement") {
+                if (direction === "decrement") {
                     newMinuteValue = oldMinuteValue - self.settings.minute.step;
 
                     // tolerate the wrong step number and move to a valid step
@@ -185,7 +160,7 @@
                         newMinuteValue = self.settings.minute.min;
                     }
                 }
-                else if (self.settings.direction === "increment") {
+                else if (direction === "increment") {
                     newMinuteValue = oldMinuteValue + self.settings.minute.step;
 
                     // tolerate the wrong step number and move to a valid step
@@ -219,8 +194,6 @@
                 $(container).attr("data-hour-value", newHourValue);
                 $(container).attr("data-minute-value", newMinuteValue);
                 $(inputMinuteTextbox).select();
-
-                saveOptions(container, self.settings);
             }
 
             if (oldHourValue != newHourValue || oldMinuteValue != newMinuteValue) {
@@ -239,11 +212,6 @@
          * Change the time setter values from arrow up/down key events
          */
         var updateTimeValueByArrowKeys = function (sender, event) {
-            var container = $(sender).parents(".timesetter-container");
-            loadOptions(container);
-
-            var senderUpBtn = $(container).find(".timesetter-btn-up");
-            var senderDownBtn = $(container).find(".timesetter-btn-down");
             switch (event.which) {
                 case 13: // return
                     break;
@@ -252,21 +220,20 @@
                     break;
 
                 case 38: // up
-                    senderUpBtn.click();
+                    btnUp.click();
                     break;
 
                 case 39: // right
                     break;
 
                 case 40: // down
-                    senderDownBtn.click();
+                    btnDown.click();
                     break;
 
                 default: return; // exit this handler for other keys
             }
-            event.preventDefault(); // prevent the default action (scroll / move caret)            
-            saveOptions(container, self.settings);
 
+            event.preventDefault(); // prevent the default action (scroll / move caret)
             $(sender).select();
         };
 
@@ -275,10 +242,6 @@
          */
         var formatInput = function (e) {
             var element = $(e.target);
-
-            var container = $(element).parents(".timesetter-container");
-            loadOptions(container);
-
             var unitSettings;
 
             if (unit === "hours") {
@@ -335,10 +298,8 @@
          * get the hour value from the control.
          */
         self.getHoursValue = function () {
-            var container = $(this).find(".timesetter-container");
-            var txtHour = $(container).find(".timesetter-hours");
-            if ($.isNumeric(txtHour.val())) {
-                return parseInt(txtHour.val());
+            if ($.isNumeric(inputHourTextbox.val())) {
+                return parseInt(inputHourTextbox.val());
             }
             return self.settings.hour.min;
         };
@@ -347,10 +308,8 @@
          * get the minute value from the control.
          */
         self.getMinutesValue = function () {
-            var container = $(this).find(".timesetter-container");
-            var txtMinute = $(container).find(".timesetter-minutes");
-            if ($.isNumeric(txtMinute.val())) {
-                return parseInt(txtMinute.val());
+            if ($.isNumeric(inputMinuteTextbox.val())) {
+                return parseInt(inputMinuteTextbox.val());
             }
             return self.settings.minute.min;
         };
@@ -359,16 +318,12 @@
          * get the total number of minutes from the control.
          */
         self.getTotalMinutes = function () {
-            var container = $(this).find(".timesetter-container");
-            var txtHour = $(container).find(".timesetter-hours");
-            var txtMinute = $(container).find(".timesetter-minutes");
-
             var hourValue = 0;
             var minuteValue = 0;
 
-            if ($.isNumeric(txtHour.val()) && $.isNumeric(txtMinute.val())) {
-                hourValue = parseInt(txtHour.val());
-                minuteValue = parseInt(txtMinute.val());
+            if ($.isNumeric(inputHourTextbox.val()) && $.isNumeric(inputMinuteTextbox.val())) {
+                hourValue = parseInt(inputHourTextbox.val());
+                minuteValue = parseInt(inputMinuteTextbox.val());
             }
             return ((hourValue * 60) + minuteValue);
         };
@@ -377,7 +332,6 @@
          * get the postfix display text.
          */
         self.getPostfixText = function () {
-            var container = $(this).find(".timesetter-container");
             return container.find(".timesetter-postfix-position").text();
         };
 
@@ -385,19 +339,15 @@
          * set the hour value to the control.
          */
         self.setHour = function (hourValue) {
-            var container = $(this).find(".timesetter-container");
-            loadOptions(container);
-
-            var timesetterHours = $(container).find(".timesetter-hours");
             if ($.isNumeric(hourValue)) {
-                timesetterHours.val(hourValue);
+                inputHourTextbox.val(hourValue);
             }
             else {
-                timesetterHours.val(padLeft(self.settings.hour.min.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
+                inputHourTextbox.val(padLeft(self.settings.hour.min.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
             }
+
             unit = "hours";
-            saveOptions(container, self.settings);
-            timesetterHours.change();
+            inputHourTextbox.change();
             return this;
         };
 
@@ -405,19 +355,14 @@
          * set the minute value to the control.
          */
         self.setMinute = function (minuteValue) {
-            var container = $(this).find(".timesetter-container");
-            loadOptions(container);
-
-            var txtMinute = $(container).find(".timesetter-minutes");
             if ($.isNumeric(minuteValue)) {
-                txtMinute.val(minuteValue);
+                inputMinuteTextbox.val(minuteValue);
             }
             else {
-                txtMinute.val(padLeft(self.settings.minute.min.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
+                inputMinuteTextbox.val(padLeft(self.settings.minute.min.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
             }
             unit = "minutes";
-            saveOptions(container, self.settings);
-            txtMinute.change();
+            inputMinuteTextbox.change();
             return this;
         };
 
@@ -425,12 +370,6 @@
          * set the values by calculating based on total number of minutes by caller.
          */
         self.setValuesByTotalMinutes = function (totalMinutes) {
-            var container = $(this).find(".timesetter-container");
-            loadOptions(container);
-
-            var txtHour = $(container).find(".timesetter-hours");
-            var txtMinute = $(container).find(".timesetter-minutes");
-
             var hourValue = 0;
             var minuteValue = 0;
 
@@ -440,13 +379,12 @@
                 hourValue = ((totalMinutes - minuteValue) / 60);
             }
 
-            txtHour.val(padLeft(hourValue.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
-            txtMinute.val(padLeft(minuteValue.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
+            inputHourTextbox.val(padLeft(hourValue.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
+            inputMinuteTextbox.val(padLeft(minuteValue.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
 
             // trigger formattings
             unit = "minutes";
-            saveOptions(container, self.settings);
-            txtMinute.change(); // one event is enough to do formatting one time for all the input fields
+            inputMinuteTextbox.change(); // one event is enough to do formatting one time for all the input fields
             return this;
         };
 
@@ -454,7 +392,6 @@
          * set the postfix display text.
          */
         self.setPostfixText = function (textValue) {
-            var container = self.find(".timesetter-container");
             container.find(".timesetter-postfix-position").text(textValue);
             return this;
         };
@@ -478,7 +415,6 @@
                     step: 15,
                     symbol: "mins"
                 },
-                direction: "increment", // increment or decrement
                 postfixText: "", // text to display after the input fields
                 numberPaddingChar: '0' // number left padding character ex: 00052
             };
@@ -494,43 +430,42 @@
             wrapper.html(htmlTemplate);
         }
 
-        var container = wrapper.find(".timesetter-container");
-        saveOptions(container, options);
+        container = wrapper.find(".timesetter-container");
+        inputHourTextbox = container.find('.timesetter-hours');
+        inputMinuteTextbox = container.find('.timesetter-minutes');
 
-        var btnUp = container.find('.timesetter-btn-up');
-        var btnDown = container.find('.timesetter-btn-down');
+        saveOptions(options);
 
+        btnUp = container.find('.timesetter-btn-up');
+        btnDown = container.find('.timesetter-btn-down');
         btnUp.unbind('click').bind('click', function (event) { updateTimeValue(this, event); });
         btnDown.unbind('click').bind('click', function (event) { updateTimeValue(this, event); });
 
-        var timesetterHours = container.find('.timesetter-hours');
-        var timesetterMinutes = container.find('.timesetter-minutes');
+        inputHourTextbox.unbind('focusin').bind('focusin', function (event) { $(this).select(); unitChanged(this, event); });
+        inputMinuteTextbox.unbind('focusin').bind('focusin', function (event) { $(this).select(); unitChanged(this, event); });
 
-        timesetterHours.unbind('focusin').bind('focusin', function (event) { $(this).select(); unitChanged(this, event); });
-        timesetterMinutes.unbind('focusin').bind('focusin', function (event) { $(this).select(); unitChanged(this, event); });
+        inputHourTextbox.unbind('keydown').bind('keydown', function (event) { updateTimeValueByArrowKeys(this, event); });
+        inputMinuteTextbox.unbind('keydown').bind('keydown', function (event) { updateTimeValueByArrowKeys(this, event); });
 
-        timesetterHours.unbind('keydown').bind('keydown', function (event) { updateTimeValueByArrowKeys(this, event); });
-        timesetterMinutes.unbind('keydown').bind('keydown', function (event) { updateTimeValueByArrowKeys(this, event); });
-
-        $(container).find("input[type=text]").each(function () {
+        container.find("input[type=text]").each(function () {
             $(this).change(function (e) {
                 formatInput(e);
             });
         });
 
         // set default values
-        if (timesetterHours.val().length === 0) {
-            timesetterHours.val(padLeft(self.settings.hour.min.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
+        if (inputHourTextbox.val().length === 0) {
+            inputHourTextbox.val(padLeft(self.settings.hour.min.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
         }
 
-        if (timesetterMinutes.val().length === 0) {
-            timesetterMinutes.val(padLeft(self.settings.minute.min.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
+        if (inputMinuteTextbox.val().length === 0) {
+            inputMinuteTextbox.val(padLeft(self.settings.minute.min.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
         }
 
-        var timesetterHourSymbolSpan = timesetterHours.siblings("span.timesetter-hour-symbol:first");
+        var timesetterHourSymbolSpan = inputHourTextbox.siblings("span.timesetter-hour-symbol:first");
         timesetterHourSymbolSpan.text(self.settings.hour.symbol);
 
-        var timesetterMinuteSymbolSpan = timesetterMinutes.siblings("span.timesetter-minute-symbol:first");
+        var timesetterMinuteSymbolSpan = inputMinuteTextbox.siblings("span.timesetter-minute-symbol:first");
         timesetterMinuteSymbolSpan.text(self.settings.minute.symbol);
 
         var postfixLabel = container.find(".timesetter-postfix-position");
