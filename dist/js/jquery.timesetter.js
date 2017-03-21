@@ -36,7 +36,7 @@
         var btnUp = null;
         var btnDown = null;
         var container = null;
-        var htmlTemplate = '<div class="timesetter-container">' + '<div class="timesetter-time-value-border">' + '<input type="text" class="timesetter-time-part timesetter-hours hours" data-unit="hours" autocomplete="off" />' + '<span class="timesetter-hour-symbol"></span>' + '<span class="timesetter-time-delimiter">:</span>' + '<input type="text" class="timesetter-time-part timesetter-minutes minutes" data-unit="minutes" autocomplete="off" />' + '<span class="timesetter-minute-symbol"></span>' + '<div class="timesetter-button-time-control">' + '<div type="button" data-direction="increment" class="timesetter-btn-up timesetter-updown-button">' + '<i class="glyphicon glyphicon-triangle-top"></i>' + '</div>' + '<div type="button" data-direction="decrement" class="timesetter-btn-down timesetter-updown-button">' + '<i class="glyphicon glyphicon-triangle-bottom"></i>' + '</div>' + '</div>' + '</div>' + '<label class="timesetter-postfix-position"></label>' + '</div>';
+        var htmlTemplate = '<div class="timesetter-container">' + '<div class="timesetter-time-value-border">' + '<input type="text" class="timesetter-time-part timesetter-hours hours" data-unit="hours" autocomplete="off" />' + '<span class="timesetter-hour-symbol"></span>' + '<span class="timesetter-time-delimiter">:</span>' + '<input type="text" class="timesetter-time-part timesetter-minutes minutes" data-unit="minutes" autocomplete="off" />' + '<span class="timesetter-minute-symbol"></span>' + '<div class="timesetter-button-time-control">' + '<div type="button" data-direction="increment" class="timesetter-btn-up timesetter-updown-button">' + '<i class="glyphicon glyphicon-triangle-top"></i>' + '</div>' + '<div type="button" data-direction="decrement" class="timesetter-btn-down timesetter-updown-button">' + '<i class="glyphicon glyphicon-triangle-bottom"></i>' + '</div>' + '</div>' + '</div>' + '</div>';
 
         /**
          * get max length based on input field options max value.
@@ -69,32 +69,26 @@
          * Change the time setter values from UI events.
          */
         var updateTimeValue = function updateTimeValue(sender) {
-            self.settings.hour.value = parseInt(inputHourTextbox.val());
-            self.settings.minute.value = parseInt(inputMinuteTextbox.val());
-
+            var currentHourValue = parseInt(inputHourTextbox.val().trim());
+            var currentMinuteValue = parseInt(inputMinuteTextbox.val().trim());
             var direction = $(sender).data("direction");
-
-            // validate hour and minute values
-            if (isNaN(self.settings.hour.value)) {
-                self.settings.hour.value = self.settings.hour.min;
-            }
-
-            if (isNaN(self.settings.minute.value)) {
-                self.settings.minute.value = self.settings.minute.min;
-            }
-
-            var oldHourValue;
             var newHourValue;
-            var oldMinuteValue;
             var newMinuteValue;
 
-            // update time setter by changing hour value
+            // validate hour and minute values
+            if (isNaN(currentHourValue)) {
+                currentHourValue = self.settings.hour.min;
+            }
+
+            if (isNaN(currentMinuteValue)) {
+                currentMinuteValue = self.settings.minute.min;
+            }
+
             if (unit === "hours") {
-                oldHourValue = parseInt($(inputHourTextbox).val().trim());
                 newHourValue = 0;
 
                 if (direction === "decrement") {
-                    newHourValue = oldHourValue - self.settings.hour.step;
+                    newHourValue = currentHourValue - self.settings.hour.step;
 
                     // tolerate the wrong step number and move to a valid step
                     if (newHourValue % self.settings.hour.step > 0) {
@@ -105,7 +99,7 @@
                         newHourValue = self.settings.hour.min;
                     }
                 } else if (direction === "increment") {
-                    newHourValue = oldHourValue + self.settings.hour.step;
+                    newHourValue = currentHourValue + self.settings.hour.step;
 
                     // tolerate the wrong step number and move to a valid step
                     if (newHourValue % self.settings.hour.step > 0) {
@@ -119,64 +113,54 @@
 
                 $(inputHourTextbox).val(padLeft(newHourValue.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
                 $(container).attr("data-hour-value", newHourValue);
-                $(inputHourTextbox).select();
-            } else if (unit === "minutes") // update time setter by changing minute value
-                {
-                    oldHourValue = self.settings.hour.value;
-                    newHourValue = oldHourValue;
-                    oldMinuteValue = self.settings.minute.value;
-                    newMinuteValue = oldMinuteValue;
+                $(inputHourTextbox).change().select();
+            } else if (unit === "minutes") {
+                newHourValue = currentHourValue;
+                newMinuteValue = currentMinuteValue;
 
-                    if (direction === "decrement") {
-                        newMinuteValue = oldMinuteValue - self.settings.minute.step;
+                if (direction === "decrement") {
+                    newMinuteValue = currentMinuteValue - self.settings.minute.step;
 
-                        // tolerate the wrong step number and move to a valid step
-                        if (newMinuteValue % self.settings.minute.step > 0) {
-                            newMinuteValue = newMinuteValue - newMinuteValue % self.settings.minute.step; // set to the previuos adjacent step
-                        }
-
-                        if (newHourValue <= self.settings.hour.min && oldMinuteValue <= self.settings.minute.min) {
-                            newHourValue = self.settings.hour.min;
-                            newMinuteValue = self.settings.minute.min;
-                        }
-                    } else if (direction === "increment") {
-                        newMinuteValue = oldMinuteValue + self.settings.minute.step;
-
-                        // tolerate the wrong step number and move to a valid step
-                        if (newMinuteValue % self.settings.minute.step > 0) {
-                            newMinuteValue = newMinuteValue - newMinuteValue % self.settings.minute.step; // set to the previous adjacent step
-                        }
-
-                        if (newHourValue >= self.settings.hour.max - self.settings.hour.step && oldMinuteValue >= self.settings.minute.max - self.settings.minute.step) {
-                            newHourValue = self.settings.hour.max - self.settings.hour.step;
-                            newMinuteValue = self.settings.minute.max - self.settings.minute.step;
-                        }
+                    // tolerate the wrong step number and move to a valid step
+                    if (newMinuteValue % self.settings.minute.step > 0) {
+                        newMinuteValue = newMinuteValue - newMinuteValue % self.settings.minute.step; // set to the previuos adjacent step
                     }
 
-                    // change the hour value when the minute value exceed its limits
-                    if (newMinuteValue >= self.settings.minute.max && newHourValue != self.settings.hour.max && newMinuteValue) {
-                        newMinuteValue = self.settings.minute.min;
-                        newHourValue = oldHourValue + self.settings.hour.step;
-                    } else if (newMinuteValue < self.settings.minute.min && oldHourValue >= self.settings.hour.step) {
-                        newMinuteValue = self.settings.minute.max - self.settings.minute.step;
-                        newHourValue = oldHourValue - self.settings.hour.step;
-                    } else if (newMinuteValue < self.settings.minute.min && oldHourValue < self.settings.hour.step) {
-                        newMinuteValue = self.settings.minute.min;
+                    if (newHourValue <= self.settings.hour.min && currentMinuteValue <= self.settings.minute.min) {
                         newHourValue = self.settings.hour.min;
+                        newMinuteValue = self.settings.minute.min;
+                    }
+                } else if (direction === "increment") {
+                    newMinuteValue = currentMinuteValue + self.settings.minute.step;
+
+                    // tolerate the wrong step number and move to a valid step
+                    if (newMinuteValue % self.settings.minute.step > 0) {
+                        newMinuteValue = newMinuteValue - newMinuteValue % self.settings.minute.step; // set to the previous adjacent step
                     }
 
-                    $(inputHourTextbox).val(padLeft(newHourValue.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
-                    $(inputMinuteTextbox).val(padLeft(newMinuteValue.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
-                    $(container).attr("data-hour-value", newHourValue);
-                    $(container).attr("data-minute-value", newMinuteValue);
-                    $(inputMinuteTextbox).select();
+                    if (newHourValue >= self.settings.hour.max - self.settings.hour.step && currentMinuteValue >= self.settings.minute.max - self.settings.minute.step) {
+                        newHourValue = self.settings.hour.max - self.settings.hour.step;
+                        newMinuteValue = self.settings.minute.max - self.settings.minute.step;
+                    }
                 }
 
-            if (oldHourValue != newHourValue || oldMinuteValue != newMinuteValue) {
-                self.trigger('change.timesetter', [{
-                    hour: self.getHoursValue(),
-                    minute: self.getMinutesValue()
-                }]);
+                // change the hour value when the minute value exceed its limits
+                if (newMinuteValue >= self.settings.minute.max && newHourValue != self.settings.hour.max && newMinuteValue) {
+                    newMinuteValue = self.settings.minute.min;
+                    newHourValue = currentHourValue + self.settings.hour.step;
+                } else if (newMinuteValue < self.settings.minute.min && currentHourValue >= self.settings.hour.step) {
+                    newMinuteValue = self.settings.minute.max - self.settings.minute.step;
+                    newHourValue = currentHourValue - self.settings.hour.step;
+                } else if (newMinuteValue < self.settings.minute.min && currentHourValue < self.settings.hour.step) {
+                    newMinuteValue = self.settings.minute.min;
+                    newHourValue = self.settings.hour.min;
+                }
+
+                $(inputHourTextbox).val(padLeft(newHourValue.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
+                $(inputMinuteTextbox).val(padLeft(newMinuteValue.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
+                $(container).attr("data-hour-value", newHourValue);
+                $(container).attr("data-minute-value", newMinuteValue);
+                $(inputMinuteTextbox).change().select();
             }
         };
 
@@ -271,7 +255,7 @@
         /**
          * get the hour value from the control.
          */
-        self.getHoursValue = function () {
+        self.getHours = function () {
             if ($.isNumeric(inputHourTextbox.val())) {
                 return parseInt(inputHourTextbox.val());
             }
@@ -281,7 +265,7 @@
         /**
          * get the minute value from the control.
          */
-        self.getMinutesValue = function () {
+        self.getMinutes = function () {
             if ($.isNumeric(inputMinuteTextbox.val())) {
                 return parseInt(inputMinuteTextbox.val());
             }
@@ -300,13 +284,6 @@
                 minuteValue = parseInt(inputMinuteTextbox.val());
             }
             return hourValue * 60 + minuteValue;
-        };
-
-        /**
-         * get the postfix display text.
-         */
-        self.getPostfixText = function () {
-            return container.find(".timesetter-postfix-position").text();
         };
 
         /**
@@ -341,7 +318,7 @@
         /**
          * set the values by calculating based on total number of minutes by caller.
          */
-        self.setValuesByTotalMinutes = function (totalMinutes) {
+        self.setTotalMinutes = function (totalMinutes) {
             var hourValue = 0;
             var minuteValue = 0;
 
@@ -357,14 +334,6 @@
             // trigger formattings
             unit = "minutes";
             inputMinuteTextbox.change(); // one event is enough to do formatting one time for all the input fields
-            return this;
-        };
-
-        /**
-         * set the postfix display text.
-         */
-        self.setPostfixText = function (textValue) {
-            container.find(".timesetter-postfix-position").text(textValue);
             return this;
         };
 
@@ -387,7 +356,6 @@
                     step: 15,
                     symbol: "mins"
                 },
-                postfixText: "", // text to display after the input fields
                 numberPaddingChar: '0' // number left padding character ex: 00052
             };
         };
@@ -451,9 +419,6 @@
 
         var timesetterMinuteSymbolSpan = inputMinuteTextbox.siblings("span.timesetter-minute-symbol:first");
         timesetterMinuteSymbolSpan.text(self.settings.minute.symbol);
-
-        var postfixLabel = container.find(".timesetter-postfix-position");
-        postfixLabel.text(self.settings.postfixText);
 
         return this;
     };

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>jQuery plugin - Time Setter Example</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-        crossorigin="anonymous">
+          crossorigin="anonymous">
     <link href="dist/css/jquery.timesetter.css" rel="stylesheet">
 </head>
 <body>
@@ -30,17 +30,18 @@
                     step: 15,
                     symbol: "mins"
                 },
-                postfixText: "", // text to display after the input fields
                 numberPaddingChar: '0' // number left padding character ex: 00052
             };
 
-            $(".div1").timesetter(options1).setHour(17);
-            $(".div2").timesetter().setValuesByTotalMinutes(175);
+            var timesetterOne = $(".div1").timesetter(options1).setHour(17);
+            var timesetterTwo = $(".div2").timesetter().setTotalMinutes(175);
 
-            $(".div1, .div2").on('change.timesetter',
-                function (event, data) {
-                    console.log(data);
+            timesetterOne.change(function (evt) {
+                console.log({
+                    hours: timesetterOne.getHours(),
+                    minutes: timesetterOne.getMinutes()
                 });
+            });
         });
     </script>
 </body>
