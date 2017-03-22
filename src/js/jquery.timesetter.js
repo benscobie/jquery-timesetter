@@ -290,9 +290,13 @@
         };
 
         self.setHourAndMinute = function (newHourValue, newMinuteValue) {
-            setHourInternal(newHourValue);
-            setMinuteInternal(newMinuteValue);
-            wrapper.change();
+            var updatedHours = setHourInternal(newHourValue);
+            var updatedMinutes = setMinuteInternal(newMinuteValue);
+
+            if (updatedHours || updatedMinutes) {
+                wrapper.change();
+            }
+
             return this;
         }
 
@@ -304,15 +308,20 @@
             if (parseInt(newFormattedValue) != currentHourValue) {
                 container.attr("data-hour-value", parseInt(newFormattedValue));
                 inputHourTextbox.val(newFormattedValue);
+                return true;
             }
+
+            return false;
         };
 
         /**
          * set the hour value to the control.
          */
         self.setHour = function (newHourValue) {
-            setHourInternal(newHourValue);
-            wrapper.change();
+            if (setHourInternal(newHourValue)) {
+                wrapper.change();
+            }
+
             return this;
         };
 
@@ -324,15 +333,20 @@
             if (parseInt(newFormattedValue) != currentMinuteValue) {
                 container.attr("data-minute-value", parseInt(newFormattedValue));
                 inputMinuteTextbox.val(newFormattedValue);
+                return true;
             }
+
+            return false;
         };
 
         /**
          * set the minute value to the control.
          */
         self.setMinute = function (newMinuteValue) {
-            setMinuteInternal(newMinuteValue);
-            wrapper.change();
+            if (setMinuteInternal(newMinuteValue)) {
+                wrapper.change();
+            }
+
             return this;
         };
 
