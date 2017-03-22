@@ -28,7 +28,7 @@
         /**
          * unit is taken out from self.settings to make it globally affect as currently user is concern about which unit to change.
          */
-        var unit = "minutes"; /* minutes or hours */
+        var currentlySelectedUnit = "minutes"; /* minutes or hours */
         var inputHourTextbox = null;
         var inputMinuteTextbox = null;
         var btnUp = null;
@@ -78,7 +78,7 @@
         * Capture the time unit which is about to update from events.
         */
         var unitChanged = function (sender) {
-            unit = $(sender).data("unit");
+            currentlySelectedUnit = $(sender).data("unit");
         };
 
         /**
@@ -100,7 +100,7 @@
                 currentMinuteValue = self.settings.minute.min;
             }
 
-            if (unit === "hours") {
+            if (currentlySelectedUnit === "hours") {
                 newHourValue = 0;
 
                 if (direction === "decrement") {
@@ -128,12 +128,10 @@
                     }
                 }
 
-                $(inputHourTextbox).val(padLeft(newHourValue.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
-                $(container).attr("data-hour-value", newHourValue);
-                $(inputHourTextbox).change().select();
+                self.setHour(newHourValue);
+                inputHourTextbox.select();
             }
-            else if (unit === "minutes")
-            {
+            else if (currentlySelectedUnit === "minutes") {
                 newHourValue = currentHourValue;
                 newMinuteValue = currentMinuteValue;
 
@@ -180,11 +178,8 @@
                     newHourValue = self.settings.hour.min;
                 }
 
-                $(inputHourTextbox).val(padLeft(newHourValue.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
-                $(inputMinuteTextbox).val(padLeft(newMinuteValue.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
-                $(container).attr("data-hour-value", newHourValue);
-                $(container).attr("data-minute-value", newMinuteValue);
-                $(inputMinuteTextbox).change().select();
+                self.setHourAndMinute(newHourValue, newMinuteValue);
+                inputMinuteTextbox.select();
             }
         };
 
@@ -220,58 +215,41 @@
         /**
          * apply sanitization to the input value and apply corrections.
          */
-        var formatInput = function (e) {
-            var element = $(e.target);
+        var formatValue = function (value, unitChanged) {
+            var currentValue = value;
             var unitSettings;
-
-            if (unit === "hours") {
+            if (unitChanged === "hours") {
                 unitSettings = self.settings.hour;
             }
-            else if (unit === "minutes") {
+            else if (unitChanged === "minutes") {
                 unitSettings = self.settings.minute;
             }
 
-            var maxLength = getMaxLength(unitSettings);
-
-            if (!$.isNumeric(element.val())) {
-                $(element).val(padLeft(unitSettings.min.toString(), getMaxLength(unitSettings), self.settings.numberPaddingChar));
-                return false;
-            }
-
-            var value = parseInt(parseFloat(element.val()));
             var maxLengthUnitSettings = getMaxLength(unitSettings);
 
-            // tolerate the wrong step number and move to a valid step
-            // ex: user enter 20 while step is 15, auto correct to 15
-            if (value >= unitSettings.max) {
-                value = unitSettings.max - unitSettings.step;
-                $(element).val(padLeft(value.toString(), maxLengthUnitSettings, self.settings.numberPaddingChar));
-                return false;
-            }
-            else if (value <= unitSettings.min) {
-                $(element).val(padLeft(unitSettings.min.toString(), maxLengthUnitSettings, self.settings.numberPaddingChar));
-                return false;
-            }
-            else if (padLeft(value.toString(), maxLengthUnitSettings, self.settings.numberPaddingChar) !== $(element).val()) {
-                $(element).val(padLeft(value.toString(), maxLengthUnitSettings, self.settings.numberPaddingChar));
-                return false;
-            }
-            else if ((value % unitSettings.step) > 0) {
-                value = (value - (value % unitSettings.step)); // set to the previous adjacent step
-                $(element).val(padLeft(value.toString(), maxLengthUnitSettings, self.settings.numberPaddingChar));
-                return false;
+            if (!$.isNumeric(value)) {
+                value = unitSettings.min;
+            } else {
+                value = parseInt(parseFloat(value));
+
+                // tolerate the wrong step number and move to a valid step
+                // ex: user enter 20 while step is 15, auto correct to 15
+                if (value > unitSettings.max) {
+                    value = unitSettings.max - unitSettings.step;
+                }
+                else if (value < unitSettings.min) {
+                    value = unitSettings.min;
+                }
+                else if ((value % unitSettings.step) > 0) {
+                    value = (value - (value % unitSettings.step)); // set to the previous adjacent step  
+                }
+                else if (value >= Math.pow(10, maxLengthUnitSettings)) {
+                    value = (Math.pow(10, maxLengthUnitSettings) - 1);
+                }
             }
 
-            //if the letter is not digit then display error and don't type anything
-            if (e.which != 8 && e.which !== 0 && (e.which < 48 || e.which > 57)) {
-                //display error message
-                return false;
-            }
-
-            if (value >= Math.pow(10, maxLengthUnitSettings)) {
-                $(element).val(padLeft((Math.pow(10, maxLengthUnitSettings) - 1).toString(), maxLengthUnitSettings, self.settings.numberPaddingChar));
-                return false;
-            }
+            value = padLeft(value, getMaxLength(unitSettings), self.settings.numberPaddingChar);
+            return value;
         };
 
         /**
@@ -281,6 +259,7 @@
             if ($.isNumeric(inputHourTextbox.val())) {
                 return parseInt(inputHourTextbox.val());
             }
+
             return self.settings.hour.min;
         };
 
@@ -291,6 +270,7 @@
             if ($.isNumeric(inputMinuteTextbox.val())) {
                 return parseInt(inputMinuteTextbox.val());
             }
+
             return self.settings.minute.min;
         };
 
@@ -305,37 +285,54 @@
                 hourValue = parseInt(inputHourTextbox.val());
                 minuteValue = parseInt(inputMinuteTextbox.val());
             }
+
             return ((hourValue * 60) + minuteValue);
+        };
+
+        self.setHourAndMinute = function (newHourValue, newMinuteValue) {
+            setHourInternal(newHourValue);
+            setMinuteInternal(newMinuteValue);
+            wrapper.change();
+            return this;
+        }
+
+        var setHourInternal = function (newHourValue) {
+            var currentHourValue = parseInt(inputHourTextbox.val());
+            currentlySelectedUnit = "hours";
+
+            var newFormattedValue = formatValue(newHourValue, "hours");
+            if (parseInt(newFormattedValue) != currentHourValue) {
+                container.attr("data-hour-value", parseInt(newFormattedValue));
+                inputHourTextbox.val(newFormattedValue);
+            }
         };
 
         /**
          * set the hour value to the control.
          */
-        self.setHour = function (hourValue) {
-            if ($.isNumeric(hourValue)) {
-                inputHourTextbox.val(hourValue);
-            }
-            else {
-                inputHourTextbox.val(padLeft(self.settings.hour.min.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
-            }
-
-            unit = "hours";
-            inputHourTextbox.change();
+        self.setHour = function (newHourValue) {
+            setHourInternal(newHourValue);
+            wrapper.change();
             return this;
+        };
+
+        var setMinuteInternal = function (newMinuteValue) {
+            var currentMinuteValue = parseInt(inputMinuteTextbox.val());
+            currentlySelectedUnit = "minutes";
+
+            var newFormattedValue = formatValue(newMinuteValue, "minutes");
+            if (parseInt(newFormattedValue) != currentMinuteValue) {
+                container.attr("data-minute-value", parseInt(newFormattedValue));
+                inputMinuteTextbox.val(newFormattedValue);
+            }
         };
 
         /**
          * set the minute value to the control.
          */
-        self.setMinute = function (minuteValue) {
-            if ($.isNumeric(minuteValue)) {
-                inputMinuteTextbox.val(minuteValue);
-            }
-            else {
-                inputMinuteTextbox.val(padLeft(self.settings.minute.min.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
-            }
-            unit = "minutes";
-            inputMinuteTextbox.change();
+        self.setMinute = function (newMinuteValue) {
+            setMinuteInternal(newMinuteValue);
+            wrapper.change();
             return this;
         };
 
@@ -352,12 +349,8 @@
                 hourValue = ((totalMinutes - minuteValue) / 60);
             }
 
-            inputHourTextbox.val(padLeft(hourValue.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
-            inputMinuteTextbox.val(padLeft(minuteValue.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
-
-            // trigger formattings
-            unit = "minutes";
-            inputMinuteTextbox.change(); // one event is enough to do formatting one time for all the input fields
+            setHourInternal(hourValue);
+            setMinuteInternal(minuteValue);
             return this;
         };
 
@@ -411,20 +404,12 @@
         inputHourTextbox.unbind('keydown').bind('keydown', function (event) { updateTimeValueByArrowKeys(this, event); });
         inputMinuteTextbox.unbind('keydown').bind('keydown', function (event) { updateTimeValueByArrowKeys(this, event); });
 
-        container.find("input[type=text]").each(function () {
-            $(this).change(function (e) {
-                formatInput(e);
-            });
-        });
+        inputHourTextbox.change(function (e) { self.setHour($(this).val()); e.stopPropagation(); });
+        inputMinuteTextbox.change(function (e) { self.setMinute($(this).val()); e.stopPropagation(); });
 
         // set default values
-        if (inputHourTextbox.val().length === 0) {
-            inputHourTextbox.val(padLeft(self.settings.hour.min.toString(), getMaxLength(self.settings.hour), self.settings.numberPaddingChar));
-        }
-
-        if (inputMinuteTextbox.val().length === 0) {
-            inputMinuteTextbox.val(padLeft(self.settings.minute.min.toString(), getMaxLength(self.settings.minute), self.settings.numberPaddingChar));
-        }
+        if (inputHourTextbox.val().length === 0) setHourInternal(self.settings.hour.min);
+        if (inputMinuteTextbox.val().length === 0) setMinuteInternal(self.settings.minute.min);
 
         var timesetterHourSymbolSpan = inputHourTextbox.siblings("span.timesetter-hour-symbol:first");
         timesetterHourSymbolSpan.text(self.settings.hour.symbol);
