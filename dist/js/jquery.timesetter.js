@@ -33,6 +33,8 @@
         var currentlySelectedUnit = "minutes"; /* minutes or hours */
         var inputHourTextbox = null;
         var inputMinuteTextbox = null;
+        var currentHourValue = null;
+        var currentMinuteValue = null;
         var btnUp = null;
         var btnDown = null;
         var container = null;
@@ -48,14 +50,12 @@
         /**
          * save the element options' values as a data value within the element.
          */
-        var saveOptions = function saveOptions(options) {
+        var updateSettings = function updateSettings(options) {
             if (options) {
                 self.settings = $.extend(self.settings, options);
             } else {
                 self.settings = self.getDefaultSettings();
             }
-
-            return self.settings;
         };
 
         /**
@@ -69,20 +69,9 @@
          * Change the time setter values from UI events.
          */
         var updateTimeValue = function updateTimeValue(sender) {
-            var currentHourValue = parseInt(inputHourTextbox.val().trim());
-            var currentMinuteValue = parseInt(inputMinuteTextbox.val().trim());
             var direction = $(sender).data("direction");
             var newHourValue;
             var newMinuteValue;
-
-            // validate hour and minute values
-            if (isNaN(currentHourValue)) {
-                currentHourValue = self.settings.hour.min;
-            }
-
-            if (isNaN(currentMinuteValue)) {
-                currentMinuteValue = self.settings.minute.min;
-            }
 
             if (currentlySelectedUnit === "hours") {
                 newHourValue = 0;
@@ -235,37 +224,21 @@
          * get the hour value from the control.
          */
         self.getHours = function () {
-            if ($.isNumeric(inputHourTextbox.val())) {
-                return parseInt(inputHourTextbox.val());
-            }
-
-            return self.settings.hour.min;
+            return currentHourValue;
         };
 
         /**
          * get the minute value from the control.
          */
         self.getMinutes = function () {
-            if ($.isNumeric(inputMinuteTextbox.val())) {
-                return parseInt(inputMinuteTextbox.val());
-            }
-
-            return self.settings.minute.min;
+            return currentMinuteValue;
         };
 
         /**
          * get the total number of minutes from the control.
          */
         self.getTotalMinutes = function () {
-            var hourValue = 0;
-            var minuteValue = 0;
-
-            if ($.isNumeric(inputHourTextbox.val()) && $.isNumeric(inputMinuteTextbox.val())) {
-                hourValue = parseInt(inputHourTextbox.val());
-                minuteValue = parseInt(inputMinuteTextbox.val());
-            }
-
-            return hourValue * 60 + minuteValue;
+            return self.getHours() * 60 + self.getMinutes();
         };
 
         self.setHourAndMinute = function (newHourValue, newMinuteValue) {
@@ -280,13 +253,12 @@
         };
 
         var setHourInternal = function setHourInternal(newHourValue) {
-            var currentHourValue = parseInt(inputHourTextbox.val());
-            currentlySelectedUnit = "hours";
-
             var newFormattedValue = formatValue(newHourValue, "hours");
-            if (parseInt(newFormattedValue) != currentHourValue) {
-                container.attr("data-hour-value", parseInt(newFormattedValue));
-                inputHourTextbox.val(newFormattedValue);
+            inputHourTextbox.val(newFormattedValue);
+
+            if (currentHourValue != parseInt(newFormattedValue)) {
+                currentHourValue = parseInt(newFormattedValue);
+                container.attr("data-hour-value", self.getHours());
                 return true;
             }
 
@@ -305,13 +277,12 @@
         };
 
         var setMinuteInternal = function setMinuteInternal(newMinuteValue) {
-            var currentMinuteValue = parseInt(inputMinuteTextbox.val());
-            currentlySelectedUnit = "minutes";
-
             var newFormattedValue = formatValue(newMinuteValue, "minutes");
-            if (parseInt(newFormattedValue) != currentMinuteValue) {
-                container.attr("data-minute-value", parseInt(newFormattedValue));
-                inputMinuteTextbox.val(newFormattedValue);
+            inputMinuteTextbox.val(newFormattedValue);
+
+            if (currentMinuteValue != parseInt(newFormattedValue)) {
+                currentMinuteValue = parseInt(newFormattedValue);
+                container.attr("data-minute-value", self.getMinutes());
                 return true;
             }
 
@@ -384,7 +355,11 @@
         inputHourTextbox = container.find('.timesetter-hours');
         inputMinuteTextbox = container.find('.timesetter-minutes');
 
-        saveOptions(options);
+        updateSettings(options);
+
+        // set default values
+        if (currentHourValue === null) setHourInternal(self.settings.hour.min);
+        if (currentMinuteValue === null) setMinuteInternal(self.settings.minute.min);
 
         btnUp = container.find('.timesetter-btn-up');
         btnDown = container.find('.timesetter-btn-down');
@@ -415,10 +390,6 @@
         inputMinuteTextbox.change(function (e) {
             self.setMinute($(this).val());e.stopPropagation();
         });
-
-        // set default values
-        if (inputHourTextbox.val().length === 0) setHourInternal(self.settings.hour.min);
-        if (inputMinuteTextbox.val().length === 0) setMinuteInternal(self.settings.minute.min);
 
         var timesetterHourSymbolSpan = inputHourTextbox.siblings("span.timesetter-hour-symbol:first");
         timesetterHourSymbolSpan.text(self.settings.hour.symbol);
