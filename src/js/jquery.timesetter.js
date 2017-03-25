@@ -36,6 +36,7 @@
         var btnUp = null;
         var btnDown = null;
         var container = null;
+        var numberPaddingChar = '0';
         var htmlTemplate =
             '<div class="timesetter-container">' +
             '<div class="timesetter-time-value-border">' +
@@ -237,7 +238,7 @@
                 }
             }
 
-            value = padLeft(value, getMaxLength(unitSettings), self.settings.numberPaddingChar);
+            value = padLeft(value, getMaxLength(unitSettings), numberPaddingChar);
             return value;
         };
 
@@ -357,8 +358,7 @@
                     max: 60,
                     step: 15,
                     symbol: "mins"
-                },
-                numberPaddingChar: '0' // number left padding character ex: 00052
+                }
             };
         };
 

@@ -38,6 +38,7 @@
         var btnUp = null;
         var btnDown = null;
         var container = null;
+        var numberPaddingChar = '0';
         var htmlTemplate = '<div class="timesetter-container">' + '<div class="timesetter-time-value-border">' + '<input type="text" class="timesetter-time-part timesetter-hours hours" data-unit="hours" autocomplete="off" />' + '<span class="timesetter-hour-symbol"></span>' + '<span class="timesetter-time-delimiter">:</span>' + '<input type="text" class="timesetter-time-part timesetter-minutes minutes" data-unit="minutes" autocomplete="off" />' + '<span class="timesetter-minute-symbol"></span>' + '<div class="timesetter-button-time-control">' + '<div type="button" data-direction="increment" class="timesetter-btn-up timesetter-updown-button">' + '<i class="glyphicon glyphicon-triangle-top"></i>' + '</div>' + '<div type="button" data-direction="decrement" class="timesetter-btn-down timesetter-updown-button">' + '<i class="glyphicon glyphicon-triangle-bottom"></i>' + '</div>' + '</div>' + '</div>' + '</div>';
 
         /**
@@ -216,7 +217,7 @@
                 }
             }
 
-            value = padLeft(value, getMaxLength(unitSettings), self.settings.numberPaddingChar);
+            value = padLeft(value, getMaxLength(unitSettings), numberPaddingChar);
             return value;
         };
 
@@ -336,8 +337,7 @@
                     max: 60,
                     step: 15,
                     symbol: "mins"
-                },
-                numberPaddingChar: '0' // number left padding character ex: 00052
+                }
             };
         };
 
