@@ -346,14 +346,12 @@
         self.getDefaultSettings = function () {
             return {
                 hour: {
-                    value: 0,
                     min: 0,
                     max: 24,
                     step: 1,
                     symbol: "h"
                 },
                 minute: {
-                    value: 0,
                     min: 0,
                     max: 60,
                     step: 15,
